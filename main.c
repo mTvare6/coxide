@@ -88,8 +88,8 @@ int main (int argc, char *argv[]){
 
       while(fscanf(dbfp, "%zu,%s", &buf.freq, buf.path)==2){
         i++;
-        if(strstr(buf.path, argv[1])){
-          if(buf.freq>most.freq){
+        if(buf.freq>most.freq){
+          if(strstr(buf.path, argv[1])){
             //NOTE: dest is as large as source, do I need to use stpncpy
             stpcpy(most.path, buf.path);
             most.freq=buf.freq;
