@@ -8,6 +8,9 @@
 #include <pwd.h>
 
 
+#define STATIC_DB 0
+
+
 typedef struct {
   char *path;
   size_t freq;
@@ -23,6 +26,7 @@ int main (int argc, char *argv[]){
     if ((homedir = getenv("HOME")) == NULL) {
       homedir = getpwuid(getuid())->pw_dir;
     }
+#if(STATIC_DB==0)
     if(data_home==NULL){
       data_home=malloc(strlen(homedir)+23); // /.local/share/coxide/\0 = 23
       if(data_home==NULL){perror("malloc() returned NULL");}
@@ -34,6 +38,10 @@ int main (int argc, char *argv[]){
     }
     const char* DBFILE = easycat(data_home, "main.db");
     const char* TMPDBFILE = easycat(data_home, "tmp.db");
+#else
+#define DBFILE "/Users/me/.local/share/coxide/main.db"
+#define TMPDBFILE  "/Users/me/.local/share/coxide/tmp.db"
+#endif
 
     mkdir(data_home, S_IRWXU | S_IRWXG | S_IRWXO);
     FILE *dbfp = fopen(DBFILE, "r");
@@ -51,8 +59,7 @@ int main (int argc, char *argv[]){
       fputs("Unable to open file", stderr);
       exit(2);
     }
-    free((void *)DBFILE);
-    free((void *)TMPDBFILE);
+
     if(argv[1][0]=='-'){
 
       char *resolved_path = malloc(sizeof(char)*PATH_MAX);
@@ -74,8 +81,6 @@ int main (int argc, char *argv[]){
       if(!prev_exist){
         fprintf(tmpdbfp, "1,%s\n", resolved_path);
       }
-      rename(TMPDBFILE, DBFILE);
-
     }
     else{
       if(new_db){
@@ -107,13 +112,17 @@ int main (int argc, char *argv[]){
           fprintf(tmpdbfp, "%zu,%s\n", buf.freq, buf.path);
         }
       }
-      rename(TMPDBFILE, DBFILE);
       if(li!=0){
         puts(most.path);
       } else{
         puts(homedir);
       }
     }
+    rename(TMPDBFILE, DBFILE);
+#if(STATIC_DB==0)
+    free((void *)DBFILE);
+    free((void *)TMPDBFILE);
+#endif
     fclose(dbfp);
   }
   return 0;
