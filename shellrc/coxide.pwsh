@@ -1,0 +1,16 @@
+function o {
+  if ($args.Length -eq 0) {
+    cd ~
+  }
+  elseif ($args.Length -eq 1 -and $args[0] -eq '-') {
+    popd
+  }
+  elseif ($args.Length -eq 1 -and (Test-Path $args[0] -PathType Container)) {
+    coxide - $args[0]
+      cd $args[0]
+  }
+  else {
+    $result = coxide @args
+      cd $result
+  }
+}

@@ -1,0 +1,12 @@
+fn o [@rest]{
+    if (builtin:eq [] $rest) {
+        cd ~
+    } elif (builtin:eq [-] $rest) {
+      popd
+    } elif (and (builtin:eq (builtin:count $rest) 1) (path:is-dir $rest[0])) {
+        coxide - $rest[0]
+        cd $rest[0]
+    } else {
+        cd (coxide $rest[0])
+    }
+}
