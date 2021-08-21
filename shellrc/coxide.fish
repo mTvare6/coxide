@@ -10,7 +10,7 @@ function o
         coxide - $argv[1]
         cd $argv[1]
     else
-        set -l coxide_result (command zoxide $argv[1])
+        set -l coxide_result (command coxide $argv[1])
         and cd $coxide_result
     end
 end

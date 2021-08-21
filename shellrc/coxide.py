@@ -8,7 +8,7 @@ import xonsh.environ
 
 
 def coxide_bin() -> str:
-    """Finds and returns the location of the zoxide binary."""
+    """Finds and returns the location of the coxide binary."""
     bin = xonsh.environ.locate_binary("coxide")
     if bin is None:
         bin = "coxide"
@@ -20,7 +20,6 @@ def o(args: List[str]):
     if args == []:
         xonsh.dirstack.cd([])
     # elif args == ["-"]:
-    #     __zoxide_cd("-")
     elif len(args) == 1 and os.path.isdir(args[0]):
         subprocess.run([coxide_bin(), "-", args[0]])
         xonsh.dirstack.cd(args[0])
