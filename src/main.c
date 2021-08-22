@@ -14,6 +14,7 @@
 
 
 #define STATIC_DB 0
+#define PATH_ALLOC_SIZE PATH_MAX*4
 
 
 typedef struct {
@@ -67,13 +68,13 @@ int main (int argc, char *argv[]){
 
     if(argv[1][0]=='-'){
 
-      char *resolved_path = malloc(sizeof(char)*PATH_MAX);
+      char *resolved_path = malloc(sizeof(char)*PATH_ALLOC_SIZE);
       realpath(argv[2], resolved_path);
       if(new_db){
         fprintf(dbfp, "1,%s\n", resolved_path);
         return 0;
       }
-      path_rate_t buf = {malloc(sizeof(char)*PATH_MAX), 1};
+      path_rate_t buf = {malloc(sizeof(char)*PATH_ALLOC_SIZE), 1};
       bool prev_exist=false;
       while(fscanf(dbfp, "%zu,%s", &buf.freq, buf.path)==2){
         if(strcmp(buf.path, resolved_path)==0 || buf.path[0]=='\0'){
@@ -111,8 +112,8 @@ int main (int argc, char *argv[]){
         return 0;
       }
       size_t i=0, li=0;
-      path_rate_t most = {malloc(sizeof(char)*PATH_MAX), 0};
-      path_rate_t buf = {malloc(sizeof(char)*PATH_MAX), 1};
+      path_rate_t most = {malloc(sizeof(char)*PATH_ALLOC_SIZE), 0};
+      path_rate_t buf = {malloc(sizeof(char)*PATH_ALLOC_SIZE), 1};
 
       while(fscanf(dbfp, "%zu,%s", &buf.freq, buf.path)==2){
         i++;

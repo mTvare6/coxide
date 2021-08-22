@@ -3,7 +3,7 @@ BIN=coxide
 
 
 all:
-	$(CC) src/main.c -o $(BIN)
+	$(CC) src/main.c -O3 -o $(BIN)
 
 
 install:
