@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <pwd.h>
+#include "shell.h"
 
 
 #define STATIC_DB 0
@@ -80,6 +81,24 @@ int main (int argc, char *argv[]){
       }
       if(!prev_exist){
         fprintf(tmpdbfp, "1,%s\n", resolved_path);
+      }
+    } else if(strncmp(argv[1], "shell", 5)==0){
+      if(argc>2){
+        if(strncmp(argv[2], "zsh", 3)==0){
+          posixsh();
+        } else if(strncmp(argv[2], "sh", 2)==0){
+          posixsh();
+        } else if(strncmp(argv[2], "bash", 4)==0){
+          posixsh();
+        } else if(strncmp(argv[2], "bash", 4)==0){
+          posixsh();
+        } else if(strncmp(argv[2], "elvish", 6)){
+          elvish();
+        } else if(strncmp(argv[2], "xonsh", 5)){
+          xonsh();
+        } else if(strncmp(argv[2], "fish", 4)){
+          fish();
+        }
       }
     }
     else{

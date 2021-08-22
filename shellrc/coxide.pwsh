@@ -11,6 +11,6 @@ function o {
   }
   else {
     $result = coxide @args
-      cd $result
+      cd $result"
   }
 }
