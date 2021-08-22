@@ -87,6 +87,7 @@ int main (int argc, char *argv[]){
       if(!prev_exist){
         fprintf(tmpdbfp, "1,%s\n", resolved_path);
       }
+      rename(TMPDBFILE, DBFILE);
     } else if(strncmp(argv[1], "shell", 5)==0){
       if(argc>2){
         if(strncmp(argv[2], "zsh", 3)==0){
@@ -126,23 +127,23 @@ int main (int argc, char *argv[]){
           }
         }
       }
-      i=0;
-      fseek(dbfp, i, SEEK_SET);
-      while(fscanf(dbfp, "%zu,%s", &buf.freq, buf.path)==2){
-        i++;
-        if(li==i){
-          fprintf(tmpdbfp, "%zu,%s\n", most.freq+1, most.path);
-        } else {
-          fprintf(tmpdbfp, "%zu,%s\n", buf.freq, buf.path);
-        }
-      }
       if(li!=0){
+        i=0;
+        fseek(dbfp, i, SEEK_SET);
+        while(fscanf(dbfp, "%zu,%s", &buf.freq, buf.path)==2){
+          i++;
+          if(li==i){
+            fprintf(tmpdbfp, "%zu,%s\n", most.freq+1, most.path);
+          } else {
+            fprintf(tmpdbfp, "%zu,%s\n", buf.freq, buf.path);
+          }
+        }
+        rename(TMPDBFILE, DBFILE);
         puts(most.path);
       } else{
         puts(homedir);
       }
     }
-    rename(TMPDBFILE, DBFILE);
 #if(STATIC_DB==0)
     free((void *)DBFILE);
     free((void *)TMPDBFILE);
