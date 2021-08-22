@@ -34,13 +34,14 @@ o - # alias to popd
 There is no api exposed by posix compliant shells to change directory, because no program should change the directory of the shell and it is done by a shell built in `cd` coxide uses `cd` in a function to work by sourcing a function which runs cd on current shell instance
 
 <details>
-<summary><code>​</code></summary>
+<summary>​</summary>
 Unlike zoxide which claim to be a 
 > blazing fast(🚀) replacement for your cd command
 (which actually depending on cd)
+</details>
+
 
 To start using `coxide`, add it to your shell.
-</details>
 
 ##### Bash
 Add this to your configuration (usually `~/.bashrc`):
