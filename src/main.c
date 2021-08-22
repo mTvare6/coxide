@@ -2,7 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#if defined(__linux__)
+#include <linux/limits.h>
+#else
 #include <sys/syslimits.h>
+#endif
 #include <sys/stat.h>
 #include <unistd.h>
 #include <pwd.h>
@@ -37,11 +41,11 @@ int main (int argc, char *argv[]){
       if(realloc(data_home, strlen(data_home)+9)==NULL) {perror("realloc returned NULL");} // /coxide/\0 = 9
       strcat(data_home, "/coxide/");
     }
-    const char* DBFILE = easycat(data_home, "main.db");
-    const char* TMPDBFILE = easycat(data_home, "tmp.db");
+    const char* DBFILE = easycat(data_home, "main.csv");
+    const char* TMPDBFILE = easycat(data_home, "tmp.csv");
 #else
-#define DBFILE "/Users/me/.local/share/coxide/main.db"
-#define TMPDBFILE  "/Users/me/.local/share/coxide/tmp.db"
+#define DBFILE "/Users/me/.local/share/coxide/main.csv"
+#define TMPDBFILE  "/Users/me/.local/share/coxide/tmp.csv"
 #endif
 
     mkdir(data_home, S_IRWXU | S_IRWXG | S_IRWXO);

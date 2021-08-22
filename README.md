@@ -61,7 +61,7 @@ eval (coxide shell elvish | slurp)
 Add this to your configuration (usually `~/.config/fish/config.fish`):
 
 ```fish
-coxide init fish | source
+coxide shell fish | source
 ```
 
 ##### Powershell(not tested)
@@ -70,7 +70,7 @@ Add this to your configuration (find it by running `echo $profile` in PowerShell
 ```powershell
 Invoke-Expression (& {
     $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
-    (coxide init --hook $hook powershell) -join "`n"
+    (coxide shell powershell) -join "`n"
 })
 ```
 
