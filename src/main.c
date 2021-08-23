@@ -14,15 +14,15 @@
 
 
 #define STATIC_DB 0
-#define PATH_ALLOC_SIZE PATH_MAX*4
-
+#define PATH_ALLOC_SIZE PATH_MAX*2 // PATH_MAX is a standard implmented by the kernel but isn't imposed??
+#define MALLOC_FAILED EXIT_FAILURE
 
 typedef struct {
   char *path;
   size_t freq;
 } path_rate_t;
 
-const char *easycat(const char *l, const char *r);
+const char *easycat(const char *l, const char *r, size_t hlen);
 
 int main (int argc, char *argv[]){
   if(argc>1){
@@ -35,34 +35,45 @@ int main (int argc, char *argv[]){
 #if(STATIC_DB==0)
     if(data_home==NULL){
       data_home=malloc(strlen(homedir)+23); // /.local/share/coxide/\0 = 23
-      if(data_home==NULL){perror("malloc() returned NULL");}
+      if(data_home==NULL){
+        perror("malloc() returned NULL");
+        exit(MALLOC_FAILED);
+      }
       strcpy(data_home, homedir);
       strcat(data_home, "/.local/share/coxide/");
     } else{
-      if(realloc(data_home, strlen(data_home)+9)==NULL) {perror("realloc returned NULL");} // /coxide/\0 = 9
+      if(realloc(data_home, strlen(data_home)+9)==NULL) {
+        perror("realloc() returned NULL");
+        exit(MALLOC_FAILED);
+      } // /coxide/\0 = 9
       strcat(data_home, "/coxide/");
     }
-    const char* DBFILE = easycat(data_home, "main.csv");
-    const char* TMPDBFILE = easycat(data_home, "tmp.csv");
+    size_t data_home_len = strlen(data_home);
+    const char* dbfile = easycat(data_home, "main.csv", data_home_len);
+    const char* TMPDBFILE = easycat(data_home, "tmp.csv", data_home_len);
 #else
-#define DBFILE "/Users/me/.local/share/coxide/main.csv"
-#define TMPDBFILE  "/Users/me/.local/share/coxide/tmp.csv"
+const char *dbfile = "/Users/me/.local/share/coxide/main.csv";
+const char *tmpdbfile =  "/Users/me/.local/share/coxide/tmp.csv";
 #endif
 
     mkdir(data_home, S_IRWXU | S_IRWXG | S_IRWXO);
-    FILE *dbfp = fopen(DBFILE, "r");
+    FILE *dbfp = fopen(dbfile, "r");
     bool new_db=false;
     FILE *tmpdbfp = fopen(TMPDBFILE, "w");
 
     if(dbfp==NULL){
       new_db=true;
-      dbfp=fopen(DBFILE, "w+");
+      dbfp=fopen(dbfile, "w+");
     }
     if(tmpdbfp==NULL){
       tmpdbfp=fopen(TMPDBFILE, "w");
     }
-    if(dbfp==NULL||tmpdbfp==NULL){
-      fputs("Unable to open file", stderr);
+    if(dbfp==NULL){
+      perror("Cannot open dbfile");
+      exit(2);
+    }
+    if(tmpdbfp==NULL){
+      perror("Cannot open tmpdbfile");
       exit(2);
     }
 
@@ -72,7 +83,7 @@ int main (int argc, char *argv[]){
       realpath(argv[2], resolved_path);
       if(new_db){
         fprintf(dbfp, "1,%s\n", resolved_path);
-        return 0;
+        return EXIT_SUCCESS;
       }
       path_rate_t buf = {malloc(sizeof(char)*PATH_ALLOC_SIZE), 1};
       bool prev_exist=false;
@@ -87,7 +98,7 @@ int main (int argc, char *argv[]){
       if(!prev_exist){
         fprintf(tmpdbfp, "1,%s\n", resolved_path);
       }
-      rename(TMPDBFILE, DBFILE);
+      rename(TMPDBFILE, dbfile);
     } else if(strncmp(argv[1], "shell", 5)==0){
       if(argc>2){
         if(strncmp(argv[2], "zsh", 3)==0){
@@ -110,7 +121,7 @@ int main (int argc, char *argv[]){
     else{
       if(new_db){
         fputs("DBFILE was empty, use valid paths to cache directories", stderr);
-        return 0;
+        return EXIT_FAILURE;
       }
       size_t i=0, li=0;
       path_rate_t most = {malloc(sizeof(char)*PATH_ALLOC_SIZE), 0};
@@ -138,25 +149,28 @@ int main (int argc, char *argv[]){
             fprintf(tmpdbfp, "%zu,%s\n", buf.freq, buf.path);
           }
         }
-        rename(TMPDBFILE, DBFILE);
+        rename(TMPDBFILE, dbfile);
         puts(most.path);
       } else{
         puts(homedir);
       }
     }
 #if(STATIC_DB==0)
-    free((void *)DBFILE);
+    free((void *)dbfile);
     free((void *)TMPDBFILE);
 #endif
     fclose(dbfp);
   }
-  return 0;
+  return EXIT_SUCCESS;
 }
 
-const char* easycat(const char *l, const char *h)
+const char* easycat(const char *l, const char *h, size_t hlen)
 {
-    char *comb = malloc(strlen(l) + strlen(h) + 1);
-    if(comb==NULL){perror("malloc()");}
+    char *comb = malloc(hlen + strlen(h) + 1);
+    if(comb==NULL){
+      perror("malloc()");
+      exit(MALLOC_FAILED);
+    }
     strcpy(comb, l);
     strcat(comb, h);
     return comb;
