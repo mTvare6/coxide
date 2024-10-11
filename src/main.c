@@ -42,7 +42,10 @@ int main (int argc, char *argv[]){
       strcpy(data_home, homedir);
       strcat(data_home, "/.local/share/coxide/");
     } else{
-      if(realloc(data_home, strlen(data_home)+9)==NULL) {
+      char *env_data_home = data_home;
+      data_home = malloc(strlen(env_data_home) + 9);
+      strcpy(data_home, env_data_home);
+      if(data_home==NULL) {
         perror("realloc() returned NULL");
         exit(MALLOC_FAILED);
       } // /coxide/\0 = 9
